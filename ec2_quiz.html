@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS EC2 Fundamentals & SAA-C03 Interactive Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-primary: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --correct-bg: rgba(16, 185, 129, 0.15);
+      --correct-border: #10b981;
+      --correct-text: #34d399;
+      --wrong-bg: rgba(239, 68, 68, 0.15);
+      --wrong-border: #ef4444;
+      --wrong-text: #f87171;
+      --aws-orange: #ff9900;
+      --radius: 16px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 153, 0, 0.15);
+      border: 1px solid var(--aws-orange);
+      color: var(--aws-orange);
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    /* Top stats & Progress bar */
+    .quiz-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6366f1, #a855f7);
+      transition: width 0.4s ease;
+      border-radius: 999px;
+    }
+
+    /* Question Card */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+    }
+
+    .question-category {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+
+    .question-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Options */
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 1rem;
+      text-align: left;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      background: rgba(99, 102, 241, 0.12);
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+
+    .option-letter {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .option-text {
+      flex-grow: 1;
+    }
+
+    /* Option States */
+    .option-btn.selected {
+      border-color: var(--accent-primary);
+      background: rgba(99, 102, 241, 0.2);
+    }
+
+    .option-btn.correct {
+      background: var(--correct-bg) !important;
+      border-color: var(--correct-border) !important;
+      color: var(--text-main) !important;
+    }
+
+    .option-btn.correct .option-letter {
+      background: var(--correct-border);
+      color: #000;
+    }
+
+    .option-btn.wrong {
+      background: var(--wrong-bg) !important;
+      border-color: var(--wrong-border) !important;
+      color: var(--text-main) !important;
+    }
+
+    .option-btn.wrong .option-letter {
+      background: var(--wrong-border);
+      color: #fff;
+    }
+
+    .option-btn.dimmed {
+      opacity: 0.45;
+    }
+
+    /* Explanation Drawer */
+    .explanation-box {
+      display: none;
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.8);
+      border-left: 4px solid var(--accent-primary);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .explanation-box.correct {
+      border-left-color: var(--correct-border);
+    }
+
+    .explanation-box.wrong {
+      border-left-color: var(--wrong-border);
+    }
+
+    .explanation-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .explanation-text {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+
+    .explanation-ref {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--aws-orange);
+      font-weight: 500;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 0.85rem 1.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      color: white;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Summary Screen */
+    .summary-card {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: conic-gradient(var(--accent-primary) 0%, rgba(255, 255, 255, 0.1) 0%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5rem auto;
+      position: relative;
+    }
+
+    .score-inner {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .score-percent {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      h1 { font-size: 1.75rem; }
+      .quiz-meta { flex-direction: column; gap: 1rem; align-items: flex-start; }
+      .card { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge">AWS Certification Prep • SAA-C03</div>
+      <h1>EC2 Fundamentals & Architecture Quiz</h1>
+      <p class="subtitle">Test your knowledge based on your study notes</p>
+    </header>
+
+    <!-- Quiz Header Stats -->
+    <div class="quiz-meta" id="quizMeta">
+      <div class="stat-item">
+        <span class="stat-label">Progress</span>
+        <span class="stat-value" id="questionCounter">Question 1 of 17</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Score</span>
+        <span class="stat-value" id="scoreDisplay">0 / 0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Category</span>
+        <span class="stat-value" id="categoryBadge">Core Concepts</span>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Main Question View -->
+    <main id="quizView">
+      <div class="card">
+        <div class="question-category" id="questionCategory">Section 1: Core Concepts</div>
+        <h2 class="question-title" id="questionTitle">Loading question...</h2>
+
+        <div class="options-grid" id="optionsGrid">
+          <!-- Options rendered dynamically -->
+        </div>
+
+        <div class="explanation-box" id="explanationBox">
+          <div class="explanation-title" id="explanationTitle">
+            <span id="explanationIcon">💡</span> Explanation
+          </div>
+          <div class="explanation-text" id="explanationText"></div>
+          <div class="explanation-ref" id="explanationRef"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()" disabled>← Previous</button>
+        <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>Check Answer</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display: none;">Next Question →</button>
+      </div>
+    </main>
+
+    <!-- Summary Screen (Hidden by default) -->
+    <div class="card summary-card" id="summaryView" style="display: none;">
+      <h2>Quiz Completed! 🎉</h2>
+      <p class="subtitle">Here is your performance summary for EC2 Fundamentals</p>
+
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-inner">
+          <span class="score-number" id="finalScoreText">0 / 17</span>
+          <span class="score-percent" id="finalPercentText">0%</span>
+        </div>
+      </div>
+
+      <p id="performanceGrade" style="font-size: 1.15rem; font-weight: 600; margin-bottom: 2rem;"></p>
+
+      <button class="btn btn-primary" onclick="restartQuiz()">🔄 Restart Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        category: "Core Concepts & Hardware",
+        question: "Which of the following statements accurately compares EC2 Virtual Machines to Docker Containers?",
+        options: [
+          "EC2 virtualizes at the OS level sharing a single host kernel, while containers virtualize at the hardware level with hypervisors.",
+          "EC2 virtualizes at the hardware level using a hypervisor to assign isolated OS and kernel instances, while containers virtualize at the OS level sharing the host kernel.",
+          "EC2 instances share the underlying OS kernel with other tenant VMs, whereas containers run isolated dedicated hypervisors.",
+          "Containers run on dedicated hardware only, while EC2 instances always use shared hardware."
+        ],
+        correct: 1,
+        explanation: "EC2 instances use a hypervisor to slice up physical hardware, allowing each VM to run its own independent OS kernel. Containers sit on top of a host OS and share the host kernel, making them lighter.",
+        ref: "Reference: 01. ec2.md"
+      },
+      {
+        category: "Core Concepts & Hardware",
+        question: "You are designing a backend data processing system that performs real-time In-Memory caching with Redis and runs memory-intensive analytics. Which EC2 instance family is best optimized for this workload?",
+        options: [
+          "c6g.xlarge (Compute Optimized)",
+          "m5.xlarge (General Purpose)",
+          "r6i.xlarge (Memory Optimized)",
+          "i3en.xlarge (Storage Optimized)"
+        ],
+        correct: 2,
+        explanation: "The 'r' series (e.g., r6i) stands for Memory Optimized, specifically designed for RAM-heavy workloads like Redis, Memcached, and in-memory analytics. 'c' is compute, 'm' is general purpose, and 'i' is storage optimized.",
+        ref: "Reference: 01. ec2.md"
+      },
+      {
+        category: "Core Concepts & Hardware",
+        question: "In the EC2 instance naming scheme (such as t3.nano or c6g.2xlarge), what does the letter 'g' represent?",
+        options: [
+          "High-performance GPU acceleration",
+          "AWS Graviton (ARM-based custom processor)",
+          "Gigabit ethernet interface capability",
+          "General-purpose burstable performance"
+        ],
+        correct: 1,
+        explanation: "The letter 'g' in AWS EC2 instance naming indicates that the instance is powered by AWS Graviton processors (custom ARM-based silicon offering higher efficiency and lower cost).",
+        ref: "Reference: 01. ec2.md"
+      },
+      {
+        category: "Core Concepts & Hardware",
+        question: "A solutions architect wants to automatically update OS packages, install software, and download configuration files ONCE during the initial boot of an EC2 instance. What feature should be used?",
+        options: [
+          "Configure an IAM Role policy with elevated root privileges.",
+          "Add a shell script to the EC2 User Data configuration field during launch.",
+          "Pass the commands via SSH using an Elastic Network Interface (ENI) trigger.",
+          "Store the setup script inside an EBS Snapshot and attach it as the root drive."
+        ],
+        correct: 1,
+        explanation: "EC2 User Data scripts execute automatically with root privileges when an EC2 instance launches for the first time (bootstrapping).",
+        ref: "Reference: 01. ec2.md"
+      },
+      {
+        category: "Security & Access",
+        question: "A developer attempts to access a web app on port 80 of an EC2 instance. The browser continuously loads until returning a 'Connection Timed Out' error. Outbound rules allow all traffic. What is the root cause?",
+        options: [
+          "The Security Group inbound rule explicitly includes a DENY statement for port 80.",
+          "The Security Group is missing an inbound rule allowing TCP traffic on port 80.",
+          "The EC2 instance IAM role does not have permission to transmit HTTP packets.",
+          "The Security Group outbound rule is blocking HTTP response packets."
+        ],
+        correct: 1,
+        explanation: "In AWS, connection timeouts are almost always caused by Security Group rules blocking inbound traffic. By default, Security Groups block all inbound connections unless explicitly allowed.",
+        ref: "Reference: 02. security groups.md"
+      },
+      {
+        category: "Security & Access",
+        question: "Which of the following correctly contrasts Security Groups with Network ACLs (NACLs)?",
+        options: [
+          "Security Groups are Stateful (inbound allow auto-allows response), whereas NACLs are Stateless (inbound/outbound rules evaluated separately).",
+          "Security Groups operate at the Subnet level, whereas NACLs operate at the EC2 Instance level.",
+          "Security Groups support explicit DENY rules, while NACLs support ALLOW rules only.",
+          "Security Groups block outbound traffic by default, while NACLs allow outbound traffic by default."
+        ],
+        correct: 0,
+        explanation: "Security Groups operate at the EC2 instance level and are stateful (response traffic is automatically allowed). NACLs operate at the subnet level and are stateless (inbound and outbound traffic must be permitted separately).",
+        ref: "Reference: 00. Networking and AWS.md"
+      },
+      {
+        category: "Security & Access",
+        question: "An application on an EC2 instance needs to access an S3 bucket. What is the AWS security best practice for granting credentials?",
+        options: [
+          "Run 'aws configure' on the instance and enter AWS Access Key ID and Secret Access Key.",
+          "Store the IAM credentials in a plain text file inside the home directory (~/.aws/credentials).",
+          "Attach an IAM Role with an S3 Read Policy to the EC2 instance via an instance profile.",
+          "Embed the root account access keys directly inside the EC2 User Data script."
+        ],
+        correct: 2,
+        explanation: "NEVER store long-term access keys on an EC2 instance. The secure best practice is attaching an IAM Role to the EC2 instance profile, providing temporary, automatically rotated credentials.",
+        ref: "Reference: 04. ec2 instance roles.md"
+      },
+      {
+        category: "Security & Access",
+        question: "When SSHing into a Linux instance (ssh -i key.pem ec2-user@<ip>), you get an error 'Permissions 0644 for key.pem are too open'. Which command fixes this?",
+        options: [
+          "chmod 0777 key.pem",
+          "chmod 0400 key.pem",
+          "chown root key.pem",
+          "aws ec2 update-key-pair --key-name key.pem"
+        ],
+        correct: 1,
+        explanation: "SSH requires private keys to be protected against unauthorized read access by other system users. 'chmod 0400 key.pem' grants read-only permission strictly to the file owner.",
+        ref: "Reference: 03. ssh and ec2 instance connect.md"
+      },
+      {
+        category: "Purchasing & Costs",
+        question: "Which EC2 purchasing option provides up to 72% discount compared to On-Demand for steady-state workloads running continuously over 1 or 3 years?",
+        options: [
+          "Spot Instances",
+          "Reserved Instances",
+          "On-Demand Instances",
+          "Dedicated Hosts"
+        ],
+        correct: 1,
+        explanation: "Reserved Instances (and Savings Plans) offer up to 72% savings in exchange for committing to 1 or 3 years of continuous usage, ideal for steady-state databases and applications.",
+        ref: "Reference: 05. ec2 instance purchasing options.md"
+      },
+      {
+        category: "Purchasing & Costs",
+        question: "Which statement correctly describes how to cleanly terminate a Spot Instance request without unexpected re-launches?",
+        options: [
+          "Terminate the EC2 instance directly; AWS will automatically cancel the active Spot Request.",
+          "First cancel the active Spot Request, and then terminate the associated Spot Instance.",
+          "Change the Spot allocation strategy to lowestPrice before calling ec2 stop-instances.",
+          "Spot instances cannot be manually terminated; you must wait for AWS to reclaim capacity."
+        ],
+        correct: 1,
+        explanation: "Canceling a Spot Request does not terminate running instances, and terminating an instance while the Spot Request is active will cause AWS to launch a replacement. You must cancel the request first, then terminate the instance.",
+        ref: "Reference: 05. ec2 instance purchasing options.md"
+      },
+      {
+        category: "Purchasing & Costs",
+        question: "You are setting up a Spot Fleet for log processing. You want to prioritize application availability by spreading requests across all configured launch pools. Which strategy should you choose?",
+        options: [
+          "lowestPrice",
+          "diversified",
+          "capacityOptimized",
+          "priceCapacityOptimized"
+        ],
+        correct: 1,
+        explanation: "The 'diversified' Spot Fleet allocation strategy distributes instances across all specified pools, ensuring high availability and protection against capacity reclamation in a single pool.",
+        ref: "Reference: 05. ec2 instance purchasing options.md"
+      },
+      {
+        category: "Networking & IPs",
+        question: "An EC2 instance located in a public subnet is stopped and restarted. What happens to its IP addresses?",
+        options: [
+          "The Private IP changes, but the Public IP stays the same.",
+          "Both Private IP and Public IP remain unchanged.",
+          "The Private IP stays the same, but the Public IP changes.",
+          "Both Private IP and Public IP are permanently lost."
+        ],
+        correct: 2,
+        explanation: "When an EC2 instance stops and starts, its internal Private IP remains fixed, but its temporary Public IP is released back to the AWS public pool and replaced with a new Public IP.",
+        ref: "Reference: 01. private vs public IP vs Elastic IP.md"
+      },
+      {
+        category: "Networking & IPs",
+        question: "Why does AWS recommend avoiding heavy reliance on Elastic IPs in scalable production architectures?",
+        options: [
+          "Elastic IPs cause severe network latency.",
+          "Hardcoding public IPs is an architectural anti-pattern; using Elastic Load Balancers (ALBs) or Route 53 DNS is more resilient and scalable.",
+          "Elastic IPs can only be attached to instances in private subnets.",
+          "Elastic IPs automatically rotate every 24 hours."
+        ],
+        correct: 1,
+        explanation: "Relying on static Elastic IPs often reflects monolithic design. Modern scalable architectures front applications with Elastic Load Balancers or use Route 53 DNS records.",
+        ref: "Reference: 01. private vs public IP vs Elastic IP.md"
+      },
+      {
+        category: "Networking & IPs",
+        question: "What is an Elastic Network Interface (ENI) in an AWS VPC?",
+        options: [
+          "A physical router hardware component installed inside AWS datacenters.",
+          "A logical virtual network card in a VPC that can be bound to an EC2 instance and re-attached to another within the same AZ.",
+          "A DNS service that resolves domain names to private IP addresses.",
+          "An auto-scaling feature for scaling network bandwidth across regions."
+        ],
+        correct: 1,
+        explanation: "An ENI is a virtual network card bound to a specific Availability Zone. It holds private IPv4 addresses, MAC addresses, and security groups, and can be detached and moved between instances for failover.",
+        ref: "Reference: 03. Elastic Network Interfaces (ENI).md"
+      },
+      {
+        category: "Placement Groups & Architecture",
+        question: "A high-performance computing (HPC) task requires ultra-low network latency and maximum throughput between 50 EC2 instances in a single AZ. Which placement group should be selected?",
+        options: [
+          "Spread Placement Group",
+          "Cluster Placement Group",
+          "Partition Placement Group",
+          "Multi-AZ Auto Scaling Group"
+        ],
+        correct: 1,
+        explanation: "Cluster Placement Groups pack instances together on adjacent racks inside a single AZ, achieving ultra-low latency and high network throughput (at the cost of higher blast radius if the AZ fails).",
+        ref: "Reference: 02. ec2 placement groups.md"
+      },
+      {
+        category: "Placement Groups & Architecture",
+        question: "You are launching 5 critical primary database nodes and must guarantee that no two instances share the same physical hardware rack or power supply. Which placement group should you use?",
+        options: [
+          "Cluster Placement Group",
+          "Spread Placement Group (limited to 7 instances per AZ)",
+          "Partition Placement Group with 50 partitions",
+          "Dedicated Host Group"
+        ],
+        correct: 1,
+        explanation: "Spread Placement Groups place each instance on distinct physical hardware racks with independent power and networking, reducing blast radius for critical nodes (limited to 7 instances per AZ).",
+        ref: "Reference: 02. ec2 placement groups.md"
+      },
+      {
+        category: "Placement Groups & Architecture",
+        question: "A big data analytics platform running Apache Kafka and Hadoop requires hundreds of EC2 instances grouped so hardware failures in one partition do not impact other nodes. Which placement group is ideal?",
+        options: [
+          "Cluster Placement Group",
+          "Partition Placement Group",
+          "Spread Placement Group",
+          "Dedicated Host Group"
+        ],
+        correct: 1,
+        explanation: "Partition Placement Groups divide large clusters (hundreds of instances) into logical partitions, ensuring that instances in one partition do not share hardware with another (perfect for Hadoop & Kafka).",
+        ref: "Reference: 02. ec2 placement groups.md"
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let selectedOptionIndex = null;
+    let userAnswers = new Array(quizData.length).fill(null);
+    let isSubmitted = false;
+
+    function initQuiz() {
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const q = quizData[currentQuestionIndex];
+      selectedOptionIndex = userAnswers[currentQuestionIndex];
+      isSubmitted = selectedOptionIndex !== null;
+
+      // Update Header & Progress
+      document.getElementById('questionCounter').innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+      document.getElementById('categoryBadge').innerText = q.category;
+      document.getElementById('questionCategory').innerText = `Category: ${q.category}`;
+      document.getElementById('questionTitle').innerText = `${currentQuestionIndex + 1}. ${q.question}`;
+
+      const progressPercent = ((currentQuestionIndex + 1) / quizData.length) * 100;
+      document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+      // Calculate score
+      let score = 0;
+      let answeredCount = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans !== null) {
+          answeredCount++;
+          if (ans === quizData[idx].correct) score++;
+        }
+      });
+      document.getElementById('scoreDisplay').innerText = `${score} / ${answeredCount}`;
+
+      // Render Options
+      const optionsGrid = document.getElementById('optionsGrid');
+      optionsGrid.innerHTML = '';
+
+      const letters = ['A', 'B', 'C', 'D'];
+
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        if (selectedOptionIndex === idx) btn.classList.add('selected');
+
+        if (isSubmitted) {
+          btn.disabled = true;
+          if (idx === q.correct) {
+            btn.classList.add('correct');
+          } else if (idx === selectedOptionIndex && selectedOptionIndex !== q.correct) {
+            btn.classList.add('wrong');
+          } else {
+            btn.classList.add('dimmed');
+          }
+        }
+
+        btn.onclick = () => selectOption(idx);
+
+        btn.innerHTML = `
+          <div class="option-letter">${letters[idx]}</div>
+          <div class="option-text">${optText}</div>
+        `;
+        optionsGrid.appendChild(btn);
+      });
+
+      // Explanation Box
+      const expBox = document.getElementById('explanationBox');
+      if (isSubmitted) {
+        expBox.style.display = 'block';
+        const isCorrect = selectedOptionIndex === q.correct;
+        expBox.className = `explanation-box ${isCorrect ? 'correct' : 'wrong'}`;
+        document.getElementById('explanationIcon').innerText = isCorrect ? '✅ Correct!' : '❌ Incorrect!';
+        document.getElementById('explanationText').innerText = q.explanation;
+        document.getElementById('explanationRef').innerText = q.ref;
+      } else {
+        expBox.style.display = 'none';
+      }
+
+      // Buttons Visibility
+      document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+
+      if (isSubmitted) {
+        document.getElementById('submitBtn').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'inline-flex';
+        document.getElementById('nextBtn').innerText = (currentQuestionIndex === quizData.length - 1) ? 'View Summary 🏁' : 'Next Question →';
+      } else {
+        document.getElementById('submitBtn').style.display = 'inline-flex';
+        document.getElementById('submitBtn').disabled = selectedOptionIndex === null;
+        document.getElementById('nextBtn').style.display = 'none';
+      }
+    }
+
+    function selectOption(idx) {
+      if (isSubmitted) return;
+      selectedOptionIndex = idx;
+      
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach((btn, index) => {
+        btn.classList.toggle('selected', index === idx);
+      });
+
+      document.getElementById('submitBtn').disabled = false;
+    }
+
+    function submitAnswer() {
+      if (selectedOptionIndex === null || isSubmitted) return;
+      userAnswers[currentQuestionIndex] = selectedOptionIndex;
+      renderQuestion();
+    }
+
+    function nextQuestion() {
+      if (currentQuestionIndex < quizData.length - 1) {
+        currentQuestionIndex++;
+        renderQuestion();
+      } else {
+        showSummary();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+      }
+    }
+
+    function showSummary() {
+      document.getElementById('quizView').style.display = 'none';
+      document.getElementById('quizMeta').style.display = 'none';
+      document.getElementById('summaryView').style.display = 'block';
+
+      let totalScore = 0;
+      userAnswers.forEach((ans, idx) => {
+        if (ans === quizData[idx].correct) totalScore++;
+      });
+
+      const percent = Math.round((totalScore / quizData.length) * 100);
+
+      document.getElementById('finalScoreText').innerText = `${totalScore} / ${quizData.length}`;
+      document.getElementById('finalPercentText').innerText = `${percent}%`;
+
+      const scoreCircle = document.getElementById('scoreCircle');
+      scoreCircle.style.background = `conic-gradient(#10b981 ${percent}%, rgba(255, 255, 255, 0.1) ${percent}%)`;
+
+      const gradeEl = document.getElementById('performanceGrade');
+      if (percent >= 90) {
+        gradeEl.innerText = "🏆 Mastered! Ready for SAA-C03 EC2 questions!";
+        gradeEl.style.color = "#34d399";
+      } else if (percent >= 70) {
+        gradeEl.innerText = "👍 Great Job! Good grasp of EC2 fundamentals.";
+        gradeEl.style.color = "#60a5fa";
+      } else {
+        gradeEl.innerText = "📚 Keep Studying! Review your notes on Placement Groups and Purchasing Options.";
+        gradeEl.style.color = "#f87171";
+      }
+    }
+
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      selectedOptionIndex = null;
+      userAnswers.fill(null);
+      isSubmitted = false;
+
+      document.getElementById('quizView').style.display = 'block';
+      document.getElementById('quizMeta').style.display = 'flex';
+      document.getElementById('summaryView').style.display = 'none';
+
+      renderQuestion();
+    }
+
+    // Initialize on load
+    window.onload = initQuiz;
+  </script>
+</body>
+</html>
