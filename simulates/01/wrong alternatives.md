@@ -95,6 +95,39 @@
   - Amazon S3 Cross-Region Replication for database backups: backs up objects, not a relational db and doesn't provide low-RPO failover target
   - An Amazon RDS Multi-AZ DB instance: provides high-availability within a single region. It doesn't provide a cross-region replica or a sub-second cross-region RPO
 
+> Aurora global db for cross-region relational DR with low RPO and low-latency reads in secondary regions
+
+37. A small development VPC has low outbound internet traffic, and high availability is not required. The company wants the lowest-cost way to provide internet access to private-subnet instances. Which solution is MOST cost-effective?
+
+- My answer:
+  - Deploy a single NAT Gateway in one Availability Zone.
+    - a single NAT gateway is cheaper than multiple gateways but still carries hourly and data processing charges that can exceed a small NAT instance for low traffic
+
+- Correct:
+  - Run a NAT instance on a small EC2 instance
+    - for a low-traffic, non-critical development VPC, a small NAT instance can be cheaper than a NAT gateway, at the cost of additional management and lower availability
+
+- Other alternatives:
+  - Create a gateway VPC endpoint for all internet destinations: gateway VPC endpoints support specific AWS services, not general internet access
+  - Deploy a NAT Gateway in each Availability Zone: NAT gateways charge hourly and per GB processed. Multiple NAT gateways for a low-traffic development VPC is crazy expensive
+
+> For low-traffic, non-critical VPCs, a small NAT instance can be cheaper than a NAT gateway; use NAT gateways for production availability
+
+51. A company needs to catalog datasets in Amazon S3 and run Spark-based transformations for analytics. The company does not want to manage Spark clusters or infrastructure. Which service should the solutions architect use?
+
+- My answer:
+  - Amazon Athena
+    - Athena is a serverless query service. It's not a Spark ETL service for complex transformations
+
+- Correct:
+  - AWS Glue with crawlers and ETL jobs
+    - AWS glue crawlers populate the data catalog
+    - serverless Glue ETL jobs run Spark transformatinos without cluster management
+
+- Other alternatives:
+  - Kinesis data firehose: delivers streaming data, it doesn't catalog datasets on run Spark ETL jobs
+  - EMR on EC2: EMR can run Spark, but managing clusters adds operational overhead that the requirement explicitly excludes
+
 >
 
 ---
